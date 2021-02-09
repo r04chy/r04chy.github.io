@@ -4,12 +4,9 @@ title: About
 permalink: /about/
 ---
 
-Some information about you!
-
-### More Information
-
-A place to include any other types of information that you'd like to include about yourself.
+Disgruntled Yorkshire sysadmin who happens to run an MSP, drink copious quantities of beer, run quite long distances, listen to loud music and read a lot of sci-fi (not all at the same time).
 
 ### Contact me
+[roachy ['at'] roachy.net]
 
-[email@domain.com](mailto:email@domain.com)
+
