@@ -4,9 +4,8 @@ title: About
 permalink: /about/
 ---
 
-Disgruntled Yorkshire sysadmin/network engineer and consultant who used to own/run an MSP, drinks copious quantities of beer, runs quite long distances, listen to loud music and read a lot of sci-fi (not all at the same time).
+Yorkshire based sysadmin/network engineer and consultant. Occassional conference goon and co(dis)organiser of DC151, the Leeds Defcon Group <a href="https://dc151.org">DC151</a>
 
-Co-organiser of the Leeds Defcon Group, DC151 
 ### Contact me
 [roachy ['at'] roachy.net]
 
