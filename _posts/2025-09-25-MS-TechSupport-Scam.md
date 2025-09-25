@@ -51,18 +51,19 @@ The next aspect to review was the web history:
 
 This aligns with the program activity - and we can see what's happened.  My father-in-law had previously been Googling reviews for an electric drill, and presented with the usual plethora of ads while searching in Chrome and been caught by "malvertising" being served in amongst legitimate ads from Taboola.  There are a number of articles online about this behaviour, such as this one from 8 years ago, and it appears the practice is still relatively common:
 
-> [!NOTE]
-> An article on this point from Malwarebytes is worth a [look](https://www.malwarebytes.com/blog/news/2017/09/tech-support-scammers-abuse-native-ad-content-provider-taboola-serve-malvertising)
 
-Panicking when seeing the warning, and notably, checking the URL in the address bar appeared to be from Microsoft \(hxxps://180925uuuuuuukkkkkkkk012.z33.web.core.windows.net/\) showing as:
+\(An article on this point from Malwarebytes is worth a [look](https://www.malwarebytes.com/blog/news/2017/09/tech-support-scammers-abuse-native-ad-content-provider-taboola-serve-malvertising)\)
 
----
- 1491_Helpdesk_Support-W -https://180925uuuuuuukkkkkkkk012.z33.web.core.windows.net/ 
+Panicking when seeing the warning, and notably, checking the URL in the address bar appeared to be from Microsoft, as it's using the web.core.windows.net domain, and  showing as:
 
 ---
+ 1491_Helpdesk_Support-W - https://180925uuuuuuukkkkkkkk012.z33.web.core.windows.net/ 
+
+---
 
 
-(The wisdom behind Microsoft using the .web.core.windows.net domain  for end users to spin up VM's and blob storage behind is obviously questionable - when Microsoft's own  domains themselves can be untrustworthy, it renders yet more security advice from the past invalid).
+*(The wisdom behind Microsoft using the .web.core.windows.net domain  for end users to spin up VM's and blob storage behind is obviously questionable - when Microsoft's own  domains themselves can be untrustworthy, it renders yet more security advice from the past invalid).*
+
 
 He did what he thought was right and called the number on the screen (which, for the record if anyone reading this wants to have any fun, is **0800 2062779**).
 
@@ -110,7 +111,7 @@ At time of writing, this bestcontrol.ctrl421.ru resolves to 213.111.146.205 wher
 
 ![20250924133117.png](/images/MS/20250924133117.png)
 
-A quick look (https://www.shodan.io/host/213.111.146.205#8041) at this server reveals that it's listening on 80 for a redirect, 443 and more unusually 5986, the TLS certificate for which shows `Cloudbase-Init WinRM` which tells us a little about the method this provider uses for provisioning of their servers: https://cloudbase-init.readthedocs.io/en/latest/intro.html.  
+A quick [look](https://www.shodan.io/host/213.111.146.205#8041) at this server reveals that it's listening on 80 for a redirect, 443 and more unusually 5986, the TLS certificate for which shows `Cloudbase-Init WinRM` which tells us a little about the method this provider uses for provisioning of their servers: https://cloudbase-init.readthedocs.io/en/latest/intro.html.  
 
 It also appears to be running an open DNS forwarder/resolver, which implies either misconfiguration or another service the scammers are using:
 
