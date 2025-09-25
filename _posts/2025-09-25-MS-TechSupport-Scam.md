@@ -23,9 +23,10 @@ As there was no risk of affecting chain-of-custody - there's no insurance or cri
 
 I was conscious that memory forensics were unlikely to return anything that disk forensics wouldn't as the device had been fully shutdown - but my in-laws had done the right thing regardless.
 
-![20250924112214.png](/images/20250924112214.png)
+![20250924112214.png](/images/MS/20250924112214.png)
 
-![[/images/20250924112235.png]]
+![20250924112235.png](/images/MS/20250924112235.png)
+
 
 At this stage, we knew the threat actors had "done things", but had no knowledge of what tasks they had performed.  We were confident that all stored credentials on the device had been quickly rotated though - so the risk to the end users was minimal.
 
@@ -35,11 +36,11 @@ This aspect of the investigation was sped up significantly by the fact that the 
 
 Building a timeline of application execution, notable items are shown below:
 
-![[/images/20250924114541.png]]
+![20250924114541.png](/images//MS/20250924114541.png)
 
 The next aspect to review was the web history:
 
-![[/images/20250924114930.png]]
+![20250924114930.png](/images/MS/20250924114930.png)
 
 This aligns with the program activity - and we can see what's happened.  My father-in-law had previously been Googling reviews for an electric drill, and presented with the usual plethora of ads while searching in Chrome and been caught by "malvertising" being served in amongst legitimate ads from Taboola.  There are a number of articles online about this behaviour, such as this one from 8 years ago, and it appears the practice is still relatively common:
 
@@ -81,45 +82,45 @@ With limited knowledge of what files were transferred, the best course of action
 
 We already have a couple of known IPs from the UltraViewer installation, but both ScreenConnect instances were installed without any additional parameters. In order for it to know where to talk home to, then parameters must be included in the executable. Enter "strings":
 
-![[/images/20250924124429.png]]
+![20250924124429.png](/images/MS/20250924124429.png)
 
 We have a domain for the first ScreenConnect installer that was launched of hxxp://bestcontrol.ctrl421.ru
 
 I verified that both of the domains used were the same - as it's common for C2 frameworks to use multiple IP's to prevent getting locked out, but it appears these scammers don't have that level of sophistication:
 
-![[/images/20250924124803.png]]
+![20250924124803.png](/images/MS/20250924124803.png)
 
 We can also confirm the domain is still active:
 
-![[/images/20250924124915.png]]
+![20250924124915.png](/images/MS/20250924124915.png)
 
 At time of writing, this bestcontrol.ctrl421.ru resolves to 213.111.146.205 where the ScreenConnect server is hosted.
 
-![[/images/20250924133117.png]]
+![20250924133117.png](/images/MS/20250924133117.png)
 
 A quick look (https://www.shodan.io/host/213.111.146.205#8041) at this server reveals that it's listening on 80 for a redirect, 443 and more unusually 5986, the TLS certificate for which shows `Cloudbase-Init WinRM` which tells us a little about the method this provider uses for provisioning of their servers: https://cloudbase-init.readthedocs.io/en/latest/intro.html.  
 
 It also appears to be running an open DNS forwarder/resolver, which implies either misconfiguration or another service the scammers are using:
 
-![[/images/20250924135053.png]]
+![20250924135053.png](/images/MS/20250924135053.png)
 
 Notably, this domain was previously masked by Cloudflare, before migrating to a different SOLLUTIUM host before locating on this one in August of this year:
 
-![[/images/20250924162006.png]]
+![20250924162006.png](/images/MS/20250924162006.png)
 
 
 The 2 other IP's of interest resolve to 2 separate ISP's in India:
 
-![[/images/20250924133032.png]]
+![20250924133032.png](/images/MS/20250924133032.png)
 
-I
 The first host: 103.175.168.127 is not listening for traffic on any ports.  The second (45.112.71.167), however is running the same version of DNS resolver as the hosting platform in Holland (NLnet Labs NSD) and freenginx (https://freenginx.org/en/), which can be used to redirect traffic based on specific patterns, and may be used as part of the campaigns the threat actors are conducting.
 
 At this point, it's probably quite difficult to visualise the data points.
 
-Thankfully Dan vibe coded a nice, free, basic mapping tool (that helps:
+Thankfully [Dan](https://mr-r3b00t.github.io/crime-mapper/) vibe coded a nice, free, basic mapping tool that helps:
 
-![[/images/20250924144402.png]]
+![20250924144402.png](/images/MS/20250924144402.png)
+
 
 
 **Post Investigation Cleanup**
@@ -132,7 +133,7 @@ A quick check of startup items, browser extension and and scheduled tasks don't 
 
 To view  DNS requests, we only need the 8th column, so we can use awk and sort to view streamlined output:
 
-![[/images/20250924165629.png]]
+![20250924165629.png](/images/MS/20250924165629.png)
 
 A similar principle can be applied to IP traffic using tshark this time to pull an IP list:
 
@@ -150,7 +151,7 @@ Once this list has been further filtered for known good IP's, a batch lookup usi
 
 This data can then be referenced against packet captures filtered through Zeek & RITA to find a little more information about any active connections and to detect any C2 beacons through searching for uniform traffic patterns:
 
-![[/images/20250925132336.png]]
+![20250925132336.png](/images/MS/20250925132336.png)
 
 
 After checking this via a long packet capture we can have high confidence that no resident infection exists on the machine.
