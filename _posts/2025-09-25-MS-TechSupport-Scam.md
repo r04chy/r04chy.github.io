@@ -10,7 +10,14 @@ I received a call from my in-laws, who I'd describe as pretty street-smart. Howe
 My father-in-law described the incident as follows (although I'm slightly paraphrasing):
 
 
-    "I was browsing the web and trying to book a session at the local climbing wall, when a popup appeared on my screen that advised that his PC was infected with a virus, and to call Microsoft. I called a tech support advisor on the number on the screen, and they told me to install *something*, and then they started doing things with the computer.  I was watching them, but became concerned when they "disabled McAfee".  I ended the call, powered off the laptop and called you.  "
+> "I was browsing the web and trying to book a session at the 
+> local climbing wall, when a popup appeared on my screen that 
+> advised that his PC was infected with a virus, and to call 
+> Microsoft. I called a tech support advisor on the number on the 
+> screen, and they told me to install *something*, and then they 
+> started doing things with the computer.  I was watching them, but 
+> became concerned when they "disabled McAfee".  I ended the call, 
+> powered off the laptop and called you.  "
 
 
 
