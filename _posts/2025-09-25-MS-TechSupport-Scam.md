@@ -46,9 +46,9 @@ This aligns with the program activity - and we can see what's happened.  My fath
 
 https://www.malwarebytes.com/blog/news/2017/09/tech-support-scammers-abuse-native-ad-content-provider-taboola-serve-malvertising
 
-Panicking when seeing the warning, and notably, checking the URL in the address bar appeared to be from Microsoft (|hxxps://180925uuuuuuukkkkkkkk012.z33.web.core.windows.net/|) showing as:
+Panicking when seeing the warning, and notably, checking the URL in the address bar appeared to be from Microsoft (hxxps://180925uuuuuuukkkkkkkk012.z33.web.core.windows.net/) showing as:
 
-`1491_Helpdesk_Support-W -https://180925uuuuuuukkkkkkkk012.z33.web.core.windows.net/ `
+` 1491_Helpdesk_Support-W -https://180925uuuuuuukkkkkkkk012.z33.web.core.windows.net/ `
 
 (The wisdom behind Microsoft using the .web.core.windows.net domain  for end users to spin up VM's and blob storage behind is obviously questionable - when Microsoft's own  domains themselves can be untrustworthy, it renders yet more security advice from the past invalid).
 
