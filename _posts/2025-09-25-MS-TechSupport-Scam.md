@@ -9,10 +9,10 @@ I received a call from my in-laws, who I'd describe as pretty street-smart. Howe
 
 My father-in-law described the incident as follows (although I'm slightly paraphrasing):
 
- ```
+--
  "I was browsing the web and trying to book a session at the local climbing wall, when a popup appeared on my screen that advised that his PC was infected with a virus, and to call Microsoft. I called a tech support advisor on the number on the screen, and they told me to install *something*, and then they started doing things with the computer.  I was watching them, but became concerned when they "disabled McAfee".  I ended the call, powered off the laptop and called you.  "
 
-```
+---
 
 
 Naturally, I offered to check out the laptop for signs of infection, but was also interested what had happened.  I advised them to rotate all credentials that might have been used on the laptop (email, Amazon, banking, Facebook, etc) - thankfully the device is infrequently used, and they don't have a huge online presence or footprint.
@@ -60,11 +60,11 @@ The next step was to try to establish how badly my family had been compromised.
 
 Initial access was achieved by getting my father-in-law to download and install Ultraviewer to grant access to the 3rd party - this tool helpfully does have some logging, and I'm assuming that the attackers would have purged this if their access hadn't been revoked so suddenly. Connection logs helpfully gave us a couple of IP addresses and hostnames:
 
-```
-
+---
 18/09/2025 14:03:15|113643413|DESKTOP-D7HUO3J|RandomPass|103.175.168.127
 18/09/2025 14:15:57|115520960|DESKTOP-3V048DA|RandomPass|45.112.71.167
-```
+
+---
 
 It appears the sole action taken through the Ultraviewer instance was to then install two further remote access instances, both ScreenConnect.
 
