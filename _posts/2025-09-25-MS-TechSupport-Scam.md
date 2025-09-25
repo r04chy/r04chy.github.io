@@ -23,7 +23,7 @@ As there was no risk of affecting chain-of-custody - there's no insurance or cri
 
 I was conscious that memory forensics were unlikely to return anything that disk forensics wouldn't as the device had been fully shutdown - but my in-laws had done the right thing regardless.
 
-![[/images/20250924112214.png]]
+![20250924112214.png](/images/20250924112214.png)
 
 ![[/images/20250924112235.png]]
 
