@@ -1,4 +1,7 @@
-# Continuous Microsoft 365 Security Monitoring with Maester and GitHub Actions
+---
+layout: post
+title: Continuous Microsoft 365 Security Monitoring with Maester and GitHub Actions
+---
 
 Modern Microsoft 365 environments change constantly. New policies are
 added, configurations drift, and security settings evolve as teams
