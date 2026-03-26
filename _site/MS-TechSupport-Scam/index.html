@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Inside a Microsoft Tech Support Scam – Roachy's Blog – Shifting 1's and 0's</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="This is a slightly unusual post for me, as I can actually discuss an incident in depth without being bound by an NDA. Also unusual as this is a scam affecting domestic users, most of whom don’t have a budget to perform full incident response and therefore I don’t often see, but may provide some insights into the tools, techniques and procedures used in a Microsoft Tech Support Scam.
+" />
+    <meta property="og:description" content="This is a slightly unusual post for me, as I can actually discuss an incident in depth without being bound by an NDA. Also unusual as this is a scam affecting domestic users, most of whom don’t have a budget to perform full incident response and therefore I don’t often see, but may provide some insights into the tools, techniques and procedures used in a Microsoft Tech Support Scam.
+" />
+    
+    <meta name="author" content="Roachy's Blog" />
+
+    
+    <meta property="og:title" content="Inside a Microsoft Tech Support Scam" />
+    <meta property="twitter:title" content="Inside a Microsoft Tech Support Scam" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Roachy's Blog - Shifting 1's and 0's" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://avatars.githubusercontent.com/u/45288722" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Roachy's Blog</a></h1>
+            <p class="site-description">Shifting 1's and 0's</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Inside a Microsoft Tech Support Scam</h1>
+
+  <div class="entry">
+    <p>This is a slightly unusual post for me, as I can actually discuss an incident in depth without being bound by an NDA. Also unusual as this is a scam affecting domestic users, most of whom don’t have a budget to perform full incident response and therefore I don’t often see, but may provide some insights into the tools, techniques and procedures used in a Microsoft Tech Support Scam.</p>
+
+<p>I received a call from my in-laws, who I’d describe as pretty street-smart. However, as they’re both in their mid to late 70s and didn’t grow up with technology, they’ve had to learn as they’ve gone along.</p>
+
+<p>My father-in-law described the incident as follows (although I’m slightly paraphrasing):</p>
+
+<blockquote>
+  <p>“I was browsing the web and trying to book a session at the 
+local climbing wall, when a popup appeared on my screen that 
+advised that his PC was infected with a virus, and to call 
+Microsoft. I called a tech support advisor on the number on the 
+screen, and they told me to install <em>something</em>, and then they 
+started doing things with the computer.  I was watching them, but 
+became concerned when they “disabled McAfee”.  I ended the call, 
+powered off the laptop and called you.  “</p>
+</blockquote>
+
+<p>Naturally, I offered to check out the laptop for signs of infection, but was also interested what had happened.  I advised them to rotate all credentials that might have been used on the laptop (email, Amazon, banking, Facebook, etc) - thankfully the device is infrequently used, and they don’t have a huge online presence or footprint.</p>
+
+<p><strong>Investigation</strong></p>
+
+<p>As there was no risk of affecting chain-of-custody - there’s no insurance or criminal proceedings at play here, and also as I had quite a busy week, I dropped the machine into an isolated VLAN in the lab with no internet access, powered on, grabbed a disk image using FTK and grabbed a memory dump, and then sadly had to park this for a few days.  I performed a cursory check of running processes, and noted that there were 2 Screenconnect sessions running as services, and Ultraviewer - but as the laptop was restricted from accessing the internet and on an isolated network, there was no risk associated with the device talking back.</p>
+
+<p>I was conscious that memory forensics were unlikely to return anything that disk forensics wouldn’t as the device had been fully shutdown - but my in-laws had done the right thing regardless.</p>
+
+<p><img src="/images/MS/20250924112214.png" alt="20250924112214.png" /></p>
+
+<p><img src="/images/MS/20250924112235.png" alt="20250924112235.png" /></p>
+
+<p>At this stage, we knew the threat actors had “done things”, but had no knowledge of what tasks they had performed.  We were confident that all stored credentials on the device had been quickly rotated though - so the risk to the end users was minimal.</p>
+
+<p><strong>Reviewing the Disk Image in Autopsy</strong></p>
+
+<p>This aspect of the investigation was sped up significantly by the fact that the device was very infrequently used, resulting in very limited logs or activity to review.</p>
+
+<p>Building a timeline of application execution, notable items are shown below:</p>
+
+<p><img src="/images//MS/20250924114541.png" alt="20250924114541.png" /></p>
+
+<p>The next aspect to review was the web history:</p>
+
+<p><img src="/images/MS/20250924114930.png" alt="20250924114930.png" /></p>
+
+<p>This aligns with the program activity - and we can see what’s happened.  My father-in-law had previously been Googling reviews for an electric drill, and presented with the usual plethora of ads while searching in Chrome and been caught by “malvertising” being served in amongst legitimate ads from Taboola.  There are a number of articles online about this behaviour, such as this one from 8 years ago, and it appears the practice is still relatively common:</p>
+
+<p>(An article on this point from Malwarebytes is worth a <a href="https://www.malwarebytes.com/blog/news/2017/09/tech-support-scammers-abuse-native-ad-content-provider-taboola-serve-malvertising">look</a>)</p>
+
+<p>Panicking when seeing the warning, and notably, checking the URL in the address bar appeared to be from Microsoft, as it’s using the web.core.windows.net domain, and  showing as:</p>
+
+<hr />
+<p>1491_Helpdesk_Support-W - https://180925uuuuuuukkkkkkkk012.z33.web.core.windows.net/</p>
+
+<hr />
+
+<p><em>(The wisdom behind Microsoft using the .web.core.windows.net domain  for end users to spin up VM’s and blob storage behind is obviously questionable - when Microsoft’s own  domains themselves can be untrustworthy, it renders yet more security advice from the past invalid).</em></p>
+
+<p>He did what he thought was right and called the number on the screen (which, for the record if anyone reading this wants to have any fun, is <strong>0800 2062779</strong>).</p>
+
+<p><strong>Impact Assessment</strong></p>
+
+<p>The next step was to try to establish how badly my family had been compromised.</p>
+
+<p>Initial access was achieved by getting my father-in-law to download and install Ultraviewer to grant access to the 3rd party - this tool helpfully does have some logging, and I’m assuming that the attackers would have purged this if their access hadn’t been revoked so suddenly. Connection logs helpfully gave us a couple of IP addresses and hostnames:</p>
+
+<hr />
+<p>18/09/2025 14:03:15|113643413|DESKTOP-D7HUO3J|RandomPass|103.175.168.127
+18/09/2025 14:15:57|115520960|DESKTOP-3V048DA|RandomPass|45.112.71.167</p>
+
+<hr />
+
+<p>It appears the sole action taken through the Ultraviewer instance was to then install two further remote access instances, both ScreenConnect.</p>
+
+<p>ScreenConnect is a legitimate, popular remote access tool created by ConnectWise - it’s designed for helpdesks to assist users with issues.  It’s become popular with criminals though for a few  reasons:</p>
+
+<ul>
+  <li>It’s self-hosted - a criminal organisation can set this up on their own server anywhere in the world without risk of getting cut off as a result of an abuse claim</li>
+  <li>As it’s self hosted, no third party will be retaining copies of logs relating to activity.</li>
+  <li>It doesn’t log activity relating to connections or file transfers locally (either in its own or in the Windows Event Logs) beyond the time of the connection.</li>
+  <li>It runs with “System” permissions, granting the fake helpdesk access to any files or folders on the end user machine, and granting consent to launch any applications remotely without additional consent being required. A remote shell means any activity carried out can happen without being visible to the user.</li>
+</ul>
+
+<p>With limited knowledge of what files were transferred, the best course of action was to assume that any files or stored credentials on the laptop <em>could</em> have been compromised.  Thankfully, only email credentials (which had already been changed), the password for my mother-in-law’s Railcard and the password for the local climbing wall were stored. The only files of note were draft copies of the local village magazine which my mother-in-law edits - none of which would be much use to the scammers. It warms my heart a little to know that so much effort was expended by these criminals for so little gain.</p>
+
+<p><strong>Digging a Little Deeper</strong></p>
+
+<p>We already have a couple of known IPs from the UltraViewer installation, but both ScreenConnect instances were installed without any additional parameters. In order for it to know where to talk home to, then parameters must be included in the executable. Enter “strings”:</p>
+
+<p><img src="/images/MS/20250924124429.png" alt="20250924124429.png" /></p>
+
+<p>We have a domain for the first ScreenConnect installer that was launched of hxxp://bestcontrol.ctrl421.ru</p>
+
+<p>I verified that both of the domains used were the same - as it’s common for C2 frameworks to use multiple IP’s to prevent getting locked out, but it appears these scammers don’t have that level of sophistication:</p>
+
+<p><img src="/images/MS/20250924124803.png" alt="20250924124803.png" /></p>
+
+<p>We can also confirm the domain is still active:</p>
+
+<p><img src="/images/MS/20250924124915.png" alt="20250924124915.png" /></p>
+
+<p>At time of writing, this bestcontrol.ctrl421.ru resolves to 213.111.146.205 where the ScreenConnect server is hosted.</p>
+
+<p><img src="/images/MS/20250924133117.png" alt="20250924133117.png" /></p>
+
+<p>A quick <a href="https://www.shodan.io/host/213.111.146.205#8041">look</a> at this server reveals that it’s listening on 80 for a redirect, 443 and more unusually 5986, the TLS certificate for which shows <code class="language-plaintext highlighter-rouge">Cloudbase-Init WinRM</code> which tells us a little about the method this provider uses for provisioning of their servers: https://cloudbase-init.readthedocs.io/en/latest/intro.html.</p>
+
+<p>It also appears to be running an open DNS forwarder/resolver, which implies either misconfiguration or another service the scammers are using:</p>
+
+<p><img src="/images/MS/20250924135053.png" alt="20250924135053.png" /></p>
+
+<p>Notably, this domain was previously masked by Cloudflare, before migrating to a different SOLLUTIUM host before locating on this one in August of this year:</p>
+
+<p><img src="/images/MS/20250924162006.png" alt="20250924162006.png" /></p>
+
+<p>The 2 other IP’s of interest resolve to 2 separate ISP’s in India:</p>
+
+<p><img src="/images/MS/20250924133032.png" alt="20250924133032.png" /></p>
+
+<p>The first host: 103.175.168.127 is not listening for traffic on any ports.  The second (45.112.71.167), however is running the same version of DNS resolver as the hosting platform in Holland (NLnet Labs NSD) and freenginx (https://freenginx.org/en/), which can be used to redirect traffic based on specific patterns, and may be used as part of the campaigns the threat actors are conducting.</p>
+
+<p>At this point, it’s probably quite difficult to visualise the data points.</p>
+
+<p>Thankfully <a href="https://mr-r3b00t.github.io/crime-mapper/">Dan</a> vibe coded a nice, free, basic mapping tool that helps:</p>
+
+<p><img src="/images/MS/20250924144402.png" alt="20250924144402.png" /></p>
+
+<p><strong>Post Investigation Cleanup</strong></p>
+
+<p>After completing malware scans and having a reasonable level of confidence that the only installed applications were ScreenConnect and Ultraviewer, and that all evidential artifacts have been collected and retained, the next step is to ensure that there’s no secondary risk of infection or anything that hasn’t been detected by AV.</p>
+
+<p>A quick check of startup items, browser extension and and scheduled tasks don’t reveal anything malicious - and running processes checked through Velociraptor don’t indicate anything either.  To be sure, a long pcap is collected when the workstation is connected back to the internet.  Most C2 frameworks will regularly beacon.  A quick manual review of this can be performed (note that I ran the pcap from the gateway to my lab, a Ubiquiti Unifi UCG-Ultra):</p>
+
+<p><code class="language-plaintext highlighter-rouge">tcpdump -n udp port 53 -r incident2.pcap</code></p>
+
+<p>To view  DNS requests, we only need the 8th column, so we can use awk and sort to view streamlined output:</p>
+
+<p><img src="/images/MS/20250924165629.png" alt="20250924165629.png" /></p>
+
+<p>A similar principle can be applied to IP traffic using tshark this time to pull an IP list:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tshark -qnz conv,ip -r incident2.pcap | awk '{print $1}' | sort -u
+</code></pre></div></div>
+
+<p>After a bit of cleaning, we can then check the IP List for anything that immediately stands out:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for i in $(cat iplist1.txt); do curl https://ipinfo.io/"$i"; printf "\n";  sleep 3; done
+</code></pre></div></div>
+
+<p>Once this list has been further filtered for known good IP’s, a batch lookup using Maxmind’s “Insights” lookups can provide further enrichment, allowing us to filter out known CDN’s for example.  Maxmind’s Insights lookups aren’t free - so it’s recommended to de-duplicate and filter out known good IP’s before uploading.</p>
+
+<p>This data can then be referenced against packet captures filtered through Zeek &amp; RITA to find a little more information about any active connections and to detect any C2 beacons through searching for uniform traffic patterns:</p>
+
+<p><img src="/images/MS/20250925132336.png" alt="20250925132336.png" /></p>
+
+<p>After checking this via a long packet capture we can have high confidence that no resident infection exists on the machine.</p>
+
+<p><strong>Conclusion</strong>
+It’s difficult to say with certainty what the endgame was for the criminals in this instance - whether they were interrupted/disconnected before dropping malware, whether they managed to exfiltrate credentials and session tokens from the workstation before being evicted or whether they were engaged in a scam whereby further “scareware” was to be installed before charging a fee to remove it.</p>
+
+<p>It would be interesting to find out more though, so may be worth a call to their “support desk”, armed with a VM logging all activity to EDR, TLS inspection (https://www.netresec.com/?page=PolarProxy), and a few tasty canaries to see what the endgame was for the scam.</p>
+
+
+  </div>
+
+  <div class="date">
+    Written on September 25, 2025
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:roachy at roachy.net"><i class="svg-icon email"></i></a>
+
+
+<a href="https://github.com/r04chy"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/roachy"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

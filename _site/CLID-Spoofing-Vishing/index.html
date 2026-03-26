@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Anatomy of a Caller Line ID Spoofed Vishing Attack – Roachy's Blog – Shifting 1's and 0's</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Following on from a couple of Twitter conversations and as a result of this thread I thought a deeper dive into how this works (at least more than 280 characters, anyway), and how people can protect themselves from this type of scam.
+" />
+    <meta property="og:description" content="Following on from a couple of Twitter conversations and as a result of this thread I thought a deeper dive into how this works (at least more than 280 characters, anyway), and how people can protect themselves from this type of scam.
+" />
+    
+    <meta name="author" content="Roachy's Blog" />
+
+    
+    <meta property="og:title" content="Anatomy of a Caller Line ID Spoofed Vishing Attack" />
+    <meta property="twitter:title" content="Anatomy of a Caller Line ID Spoofed Vishing Attack" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Roachy's Blog - Shifting 1's and 0's" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://avatars.githubusercontent.com/u/45288722" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Roachy's Blog</a></h1>
+            <p class="site-description">Shifting 1's and 0's</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Anatomy of a Caller Line ID Spoofed Vishing Attack</h1>
+
+  <div class="entry">
+    <p>Following on from a couple of Twitter conversations and as a result of this <a href="https://twitter.com/EmmelineHartley/status/1373649332747046914"></a><a href="https://twitter.com/EmmelineHartley/status/1373649332747046914">thread</a> I thought a deeper dive into how this works (at least more than 280 characters, anyway), and how people can protect themselves from this type of scam.</p>
+
+<p>There seems to be an assumption that this type of attack is complicated to perform, but it’s relatively trivial - all that is needed is a SIP trunk provider that don’t carry out checks to ensure number ownership and/or a previously compromised phone system owned by a legitimate business to proxy the calls through who use one of those providers (if you run a SIP gateway, you’ll be very used to logs showing attempted compromise through brute forcing using <a href="https://github.com/EnableSecurity/sipvicious">SIPVicious</a>)</p>
+
+<p>I know a lot of people have got into the habit of checking numbers against a providers website, but I don’t believe that the message has got through with the updated advice from Barclays (<a href="https://www.barclays.co.uk/digisafe/phone-number-checker/">https://www.barclays.co.uk/digisafe/phone-number-checker/</a>) and many others that this doesn’t provide protection against criminals who are actively spoofing numbers.</p>
+
+<h2 id="how-does-the-attack-work">How does the attack work?</h2>
+
+<p>First of all it’s important to know how SIP Trunking works.  A business/consumer will rent a trunk from a carrier in the same way as you would historically get a phone line on the PSTN (Public Switched Telephone Network), however rather than that line physically terminating at your premises, you either notify the trunk provider of your IP address for authentication purposes, or are assigned a username and password to authenticate against the trunk. The phone system is then connected over the internet to the provider, and the provider acts like a bridge between the PSTN and the VoIP phone system.</p>
+
+<p><img src="/images/CLID/PBX.jpg" alt="SIP_Carrier_Diagram" title="SIP Carrier Diagram" /></p>
+
+<p>As part of this rental agreement, you’re also assigned either a single or range of direct dial numbers. This is where legitimate functionality can be abused. When making outbound calls a phone system has the capacity to set a series of SIP parameters in the headers.  For example, you might want to specify different outbound CLI’s for different extensions in your dialplans (your Marketing Department might want to have a different direct dial to your Finance Team), or a different office that is carried on a separate SIP trunk.  Maybe as a business you outsource certain outbound Sales activities, but want inbound calls to be routed back to you directly.</p>
+
+<p>To take the example of different departments advertising their own CLI, on Asterisk, this would look like:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>exten =&gt; _X,2100,1,Set(CALLERID(all)="Marketing"&lt;02031234567&gt;)
+exten =&gt; _X,2102,1,Set(CALLERID(all)="Finance"&lt;02031234568&gt;)
+</code></pre></div></div>
+
+<p>Some providers offer a feature called “CLIP no screening”. When this is activated with the SIP carrier the user provided CLID is accepted and sent on to the PSTN network - this is potentially dangerous. The same phone system could send:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>exten =&gt; _X.,2101,1,Set(CALLERID(all)="Marketing"&lt;02031234567&gt;)
+exten =&gt; _X.,2102,1,Set(CALLERID(all)="Finance"&lt;02031234568&gt;)
+exten =&gt; _X.,2103,1,Set(CALLERID(all)="Barclays"&lt;03457345345&gt;
+</code></pre></div></div>
+
+<p>..and pretend to be placing a call from the Barclays Fraud prevention team, as happened in the example above. Without screening the provider is “trusting” the person making the call to be honest about their number.</p>
+
+<p>Some providers are making valid efforts to make sure that this kind of fraud cannot take place on their networks by stripping the “user provided header” if it doesn’t match the DDI range that has been assigned to a trunk and replacing with the “network provided header”. Carriers such as Zen use P-Asserted Identity tags to validate that the authenticated client has the right to use the CLI that they wish to advertise.</p>
+
+<p>Others, however appear to be turning a blind eye to this behaviour or not implementing some of the controls that are available. It’s simple to search for carriers that advertise “CLIP no screening” as a feature (and on writing this one PBX provider actually lists some of these carriers on their website).</p>
+
+<h2 id="why-does-this-problem-exist">Why does this problem exist?</h2>
+
+<p>As with a lot of internet services, security has sometimes been an afterthought in the design.  The original SIP standard was defined in 1999 (<a href="https://tools.ietf.org/html/rfc2543">https://tools.ietf.org/html/rfc2543</a>) and as with many of the early drafts of internet protocols, the design focused primarily on making things work, rather than exploring the potential for abuse.  The problems with the current way SIP works are shown in <a href="https://tools.ietf.org/html/rfc7340">https://tools.ietf.org/html/rfc7340</a> and there have been subsequent RFC’s suggesting solutions to these problems.  Designing and ratifying standards is a slow process though, and then carriers and PBX providers actually need to adopt the standards, all while not breaking existing functionality.  SIP is a complex protocol - you just need to look at the permitted parameters to get an idea of how challenging it would be to remove features that many users legitimately rely on: <a href="https://www.iana.org/assignments/sip-parameters/sip-parameters.xhtml">https://www.iana.org/assignments/sip-parameters/sip-parameters.xhtml</a></p>
+
+<h2 id="how-can-the-issue-be-solved">How can the issue be solved?</h2>
+
+<p>Work is being done in this field on a technical level, and there’s no doubt that greater collaboration between telecoms companies and SIP carriers will help over time.  In order to apply technical controls though as global effort is needed to force SIP trunk providers to all adhere to the regulations - which is unlikely. For now banks and corporations need to get the message to their customers that it’s not sufficient to check a website to make sure the number calling you is valid - this isn’t a true method of verification.  If you receive a call that you’re not expecting and they want you to disclose potentially risky information, always hang up the call and ring back.</p>
+
+<p><strong><em>UPDATE - Nov 2023</em></strong></p>
+
+<p>Short update to this, as serious progress has been made in the implementation and adoption of <a href="STIR/SHAKEN">https://en.wikipedia.org/wiki/STIR/SHAKEN</a>, at least in the USA with Ofcom in the UK making this a regulatory requirement by <a href="2025">https://www.ofcom.org.uk/__data/assets/pdf_file/0029/260678/shockey-report-issues-with-cli-authentication.pdf</a>.</p>
+
+  </div>
+
+  <div class="date">
+    Written on March 24, 2021
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:roachy at roachy.net"><i class="svg-icon email"></i></a>
+
+
+<a href="https://github.com/r04chy"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/roachy"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

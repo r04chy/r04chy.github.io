@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mac Updates Overwriting /etc/ssh_config – Roachy's Blog – Shifting 1's and 0's</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="As a relatively new Mac user, I frustratingly noticed that following a recent update my /etc/ssh_config had been wiped out.  I connect to a lot of devices via and unfortunately some of them only support older key exchanges, or I have to use specific SSH keys or unusual usernames to connect that I have no control over.
+" />
+    <meta property="og:description" content="As a relatively new Mac user, I frustratingly noticed that following a recent update my /etc/ssh_config had been wiped out.  I connect to a lot of devices via and unfortunately some of them only support older key exchanges, or I have to use specific SSH keys or unusual usernames to connect that I have no control over.
+" />
+    
+    <meta name="author" content="Roachy's Blog" />
+
+    
+    <meta property="og:title" content="Mac Updates Overwriting /etc/ssh_config" />
+    <meta property="twitter:title" content="Mac Updates Overwriting /etc/ssh_config" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Roachy's Blog - Shifting 1's and 0's" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://avatars.githubusercontent.com/u/45288722" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Roachy's Blog</a></h1>
+            <p class="site-description">Shifting 1's and 0's</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Mac Updates Overwriting /etc/ssh_config</h1>
+
+  <div class="entry">
+    <p>As a relatively new Mac user, I frustratingly noticed that following a recent update my /etc/ssh_config had been wiped out.  I connect to a lot of devices via and unfortunately some of them only support older key exchanges, or I have to use specific SSH keys or unusual usernames to connect that I have no control over.</p>
+
+<p>A quick Google resulted in a few people <a href="https://discussions.apple.com/thread/252554155">reporting</a> the <a href="https://arstechnica.com/civis/threads/apple-keeps-messing-up-my-sshd_config.1329195/">same</a> issue, so it seems to be normal Apple behaviour, and to be fair, I should have done this the “correct” way when setting up the Mac in the first place.</p>
+
+<p>So… if you’re wanting to retain changes to your SSH configuration it’s probably worth dumping any specific configurations in unique files in /etc/ssh/ssh_config.d/ which is conveniently included in the /etc/ssh/ssh_config:</p>
+
+<p><img src="/images/Mac/ssh_config.png" alt="ssh_config.png" /></p>
+
+<p>RTFM, etc</p>
+
+
+  </div>
+
+  <div class="date">
+    Written on April 17, 2024
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:roachy at roachy.net"><i class="svg-icon email"></i></a>
+
+
+<a href="https://github.com/r04chy"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/roachy"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Basic Draytek Hardening Guide – Roachy's Blog – Shifting 1's and 0's</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="I’m a bit of a closet fan of Draytek Routers/Firewalls.  Given a choice of device for a small office at a budget of &lt; £200 they give quite a bit of bang for your buck, with support for IPSEC, SSL VPNs, ingress/egress firewall rules, ability to create groups and objects, IP restricted remote access and remote syslog built in.
+" />
+    <meta property="og:description" content="I’m a bit of a closet fan of Draytek Routers/Firewalls.  Given a choice of device for a small office at a budget of &lt; £200 they give quite a bit of bang for your buck, with support for IPSEC, SSL VPNs, ingress/egress firewall rules, ability to create groups and objects, IP restricted remote access and remote syslog built in.
+" />
+    
+    <meta name="author" content="Roachy's Blog" />
+
+    
+    <meta property="og:title" content="Basic Draytek Hardening Guide" />
+    <meta property="twitter:title" content="Basic Draytek Hardening Guide" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Roachy's Blog - Shifting 1's and 0's" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://avatars.githubusercontent.com/u/45288722" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Roachy's Blog</a></h1>
+            <p class="site-description">Shifting 1's and 0's</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Basic Draytek Hardening Guide</h1>
+
+  <div class="entry">
+    <p>I’m a bit of a closet fan of Draytek Routers/Firewalls.  Given a choice of device for a small office at a budget of &lt; £200 they give quite a bit of bang for your buck, with support for IPSEC, SSL VPNs, ingress/egress firewall rules, ability to create groups and objects, IP restricted remote access and remote syslog built in.</p>
+
+<p>Like anything though, it’s how you configure them that counts, and I’ve not come across many out there with a non-standard configuration. This guide uses a 2830 but the interface is fundamentally the same for most models.</p>
+
+<h2 id="changing-default-credentials">Changing Default Credentials</h2>
+
+<p>First of all, head into the System Maintenance » Admin Setting Menu and create a new Admin  user for each Administrator you have and change the existing Admin password to something suitably long and complex:</p>
+
+<p><img src="/images/draytek/Draytek_1.png" alt="Changing Creds" title="Changing Creds" /></p>
+
+<h2 id="update-firmware">Update Firmware</h2>
+
+<p>It sounds obvious, but make sure you’re running the latest firmware version for the device you have in <code class="language-plaintext highlighter-rouge">System Maintenance &gt;&gt; Firmware Upgrade</code>.  When downloading firmware from the Draytek site, you’ll have 2 options, a .RST file and a .ALL file.  The .RST will reset to factory settings on the latest firmware, so to keep your configuration select the .ALL).</p>
+
+<h2 id="disable-unnecessary-services">Disable Unnecessary Services</h2>
+<p>The golden rule – if you’re not using it, disable it.  Check IPv6 is turned off if you’re not passing v6 to the WAN, disable any unused VPN Services (<code class="language-plaintext highlighter-rouge">VPN and Remote Access  &gt;&gt; Remote Access Control</code>).  Ensure PPTP is off at a minimum.</p>
+
+<p><img src="/images/draytek/Draytek_2.png" alt="Disable Services" title="Disable Services" /></p>
+
+<p><strong>If you have a wireless model, remember to disable WPS.</strong></p>
+
+<h2 id="defining-service-objects">Defining Service Objects</h2>
+
+<p>The Drayteks allow you to define objects and groups, but don’t have any pre-configured, so they need to be manually defined. Head into <code class="language-plaintext highlighter-rouge">Object Setting &gt;&gt; Service Type Object</code> and start populating with commonly used ports:</p>
+
+<p><img src="/images/draytek/Draytek_3.png" alt="Service Objects" title="Service Objects" /></p>
+
+<p>At a minimum, you probably want to define HTTP, HTTPS, DNS, NTP, SMTP/S, IMAP/S, SSH and FTP.  Add anything else as needed and then copy the services into groups (such as HTTP and HTTPS)</p>
+
+<h2 id="backup">Backup</h2>
+
+<p>If you are setting up multiple devices, this is the right time to take a baseline config backup as a template for other devices.</p>
+
+<h2 id="defining-ip-objects">Defining IP Objects</h2>
+<p>Next we need define IP addresses for remote and local servers as needed.  If, for example you run an Active Directory domain, add the Domain Controllers into the IP Objects to allow us to create a granular ruleset for egress traffic.  For example, if you’re using a multifunction printer/scanner that needs outbound access, define this here as well.</p>
+
+<p>Specify any external hosts that you might want to NAT through, and any public services you use (such as Google DNS – 8.8.8.8)</p>
+
+<p>Each of your network ranges for VLAN’s should also go here:</p>
+
+<p><img src="/images/draytek/Draytek_4.png" alt="IP Objects" title="IP Objects" /></p>
+
+<p><img src="/images/draytek/Draytek_6.png" alt="IP Objects" title="IP Objects" /></p>
+
+<h2 id="configure-vlan-settings">Configure VLAN Settings</h2>
+
+<p>The Draytek supports either port-based or 802.1q VLAN tagging.  In <code class="language-plaintext highlighter-rouge">LAN &gt;&gt; VLAN</code> enable VLAN’s and set up as needed.</p>
+
+<p><img src="/images/draytek/Draytek_7.png" alt="VLAN Settings" title="VLAN Settings" /></p>
+
+<p>Then under the LAN, define the address for the Draytek on each of the LAN’s configured &amp; enable/disable DHCP as needed:</p>
+
+<p><img src="/images/draytek/Draytek_8.png" alt="LAN Settings" title="LAN Settings" /></p>
+
+<h2 id="syslog">Syslog</h2>
+<p>The next step is to set up syslogging to a remote syslog server.  I highly recommend this, as the built in syslogs have very limited capacity and being able to review logs will assist with debugging issues and reporting:</p>
+
+<p><img src="/images/draytek/Draytek_8.png" alt="LAN Settings" title="LAN Settings" /></p>
+
+<p>With a working syslog server you can also use <a href="https://linux.die.net/man/8/logwatch">Logwatch</a> to monitor for IoC’s or behavioural issues.  I’ll write a separate blog post on this at some point.</p>
+
+<h2 id="inbound-nat-rules">Inbound NAT Rules</h2>
+
+<p>Inbound NAT rules can either be created using the <code class="language-plaintext highlighter-rouge">NAT &gt;&gt; Open Ports</code> or <code class="language-plaintext highlighter-rouge">NAT &gt;&gt; Port Redirection</code> options – if you’re translating the same ports or multiple ports to a single host, I’d suggest the Open Ports tab.  If you’re redirecting traffic on a different external to internal port then use Port Redirection.  Note that if you apply a default deny policy as per this post, then you’ll need to define matching inbound firewall rules.</p>
+
+<h2 id="file-type-and-other-restrictions">File Type and Other Restrictions</h2>
+
+<p>It’s possible to buy an additional, inexpensive licence for web content filtering.  Unlicenced, the Drayteks support URL and Filetype Content Filters which can be tuned as needed.</p>
+
+<p><img src="/images/draytek/Draytek_9.png" alt="Filetype Settings" title="Filetype Settings" /></p>
+
+<h2 id="firewall-rules">Firewall Rules</h2>
+
+<p>The Draytek comes with a “Default Allow” ruleset.  Before changing the policies to “Default Deny”, define the explicit rules that you need under the Firewall » Filter Setup tab.</p>
+
+<p>For example, we only want the Domain Controllers to be able to make NTP and DNS requests through the perimeter, so under “Default Data Filter”  we add a rule stating:</p>
+
+<p>Direction: LAN→WAN
+Source: DC1, DC2
+Destination: Google DNS (8.8.8.8)
+Service Type: DNS</p>
+
+<p><img src="/images/draytek/Draytek_10.png" alt="Filter Settings" title="Filter Settings" /></p>
+
+<p>We can then ensure that all DNS requests are logged on the domain controller before being forwarded, and anything else is logged.</p>
+
+<p>When you have more than 7 rules in filter set 2, remember to modify the field for “next filter set”. Remember to create explicit inter-vlan rules if needed.</p>
+
+<p><img src="/images/draytek/Draytek_11.png" alt="Filter Main Settings" title="Filter Main Settings" /></p>
+
+<p>Once the rules are created, again, take a backup to ensure you don’t get locked out when applying the default deny policy.</p>
+
+<h2 id="default-deny">Default Deny</h2>
+
+<p>Change the  <code class="language-plaintext highlighter-rouge">Firewall &gt;&gt; General Setup</code>, Default Rule to Block and check the box to Syslog.</p>
+
+<p><img src="/images/draytek/Draytek_12.png" alt="Default Deny Settings" title="Default Deny Settings" /></p>
+
+<h2 id="localremote-management">Local/Remote Management</h2>
+
+<p>Head into <code class="language-plaintext highlighter-rouge">System Maintenance &gt;&gt; Remote Management</code> to configure policies. You can restrict the management interface of the Draytek to specific remote hosts, but also specific internal networks here.</p>
+
+
+  </div>
+
+  <div class="date">
+    Written on February  9, 2021
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:roachy at roachy.net"><i class="svg-icon email"></i></a>
+
+
+<a href="https://github.com/r04chy"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/roachy"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>
